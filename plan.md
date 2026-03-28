@@ -11,7 +11,7 @@ Build a containerised web dashboard for OSINT earth data visualisation. React + 
 ```
 Browser (React + TS)
   └─ WebSocket + REST ──▶ FastAPI backend
-                              ├─ OSINT data fetchers (OpenWeatherMap, Sentinel Hub, AIS, GDELT)
+                              ├─ OSINT data fetchers (USGS Earthquake, NASA EONET, GDELT, OpenSky Network, NASA GIBS)
                               ├─ WebSocket manager (push updates to panels)
                               └─ PostgreSQL (PostGIS + pgvector)
 ```
@@ -192,11 +192,12 @@ earth-/
 - Each OSINT source gets its own fetcher subclass. Adding a new source = create a new fetcher class + register it.
 
 ### Step 3.2 — Implement initial fetchers (stubs → real)
-- **OpenWeatherMapFetcher**: Current weather + alerts overlay data
-- **SentinelHubFetcher**: Satellite imagery tiles (Copernicus Open Access Hub)
-- **AISFetcher**: Ship position data (e.g., AISHub or MarineTraffic API)
-- **GDELTFetcher**: Geolocated news events from GDELT API
-- Each fetcher: validate API key on startup, handle rate limits, emit structured `FetchResult` with metadata (timestamp, record count, latency, errors)
+- **USGSFetcher**: Real-time global earthquake events — native GeoJSON feeds by time window and magnitude threshold. No key required.
+- **EONETFetcher**: NASA natural event tracking (wildfires, storms, volcanoes, floods). Clean REST API, categorised GeoJSON. No key required.
+- **GDELTFetcher**: Geolocated global news events from the GDELT API. 15-min update cadence. No key required.
+- **OpenSkyFetcher**: Live global aircraft positions via the OpenSky Network anonymous endpoint. No key required; respectful polling interval of 30–60s.
+- **NASAGIBSLayer**: NASA GIBS satellite imagery (MODIS true colour, VIIRS night-time lights, sea surface temperature) served as WMTS tile layers. Integrated directly in the Visualisation panel — no fetch pipeline needed.
+- Each fetcher: handle rate limits, emit structured `FetchResult` with metadata (timestamp, record count, latency, errors)
 
 ### Step 3.3 — Background task scheduler
 - Use `asyncio` tasks (or APScheduler) to run fetchers on their configured intervals
@@ -309,10 +310,10 @@ earth-/
 | `backend/app/config.py` | Pydantic Settings |
 | `backend/app/api/ws/manager.py` | WebSocket connection manager |
 | `backend/app/fetchers/base.py` | Abstract DataFetcher |
-| `backend/app/fetchers/openweathermap.py` | OpenWeatherMap fetcher |
-| `backend/app/fetchers/sentinel.py` | Sentinel Hub fetcher |
-| `backend/app/fetchers/ais.py` | AIS ship tracking fetcher |
-| `backend/app/fetchers/gdelt.py` | GDELT fetcher |
+| `backend/app/fetchers/usgs.py` | USGS Earthquake fetcher |
+| `backend/app/fetchers/eonet.py` | NASA EONET natural events fetcher |
+| `backend/app/fetchers/gdelt.py` | GDELT news events fetcher |
+| `backend/app/fetchers/opensky.py` | OpenSky Network live aircraft fetcher |
 | `backend/app/services/llm/base.py` | LLM provider abstraction |
 | `backend/app/models/geo_data.py` | SQLAlchemy model with PostGIS geometry |
 | `backend/app/models/embeddings.py` | pgvector embeddings model |
