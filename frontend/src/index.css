@@ -1,10 +1,13 @@
 /** Global styles — Tailwind base, terminal aesthetic overrides. */
 
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap");
+@import "leaflet/dist/leaflet.css";
+@import "react-grid-layout/css/styles.css";
+@import "react-resizable/css/styles.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap");
 
 html,
 body,
@@ -15,4 +18,37 @@ body,
   background: #000000;
   color: #ffffff;
   font-family: "JetBrains Mono", monospace;
+}
+
+/* react-grid-layout overrides */
+.react-grid-item.react-grid-placeholder {
+  background: #333333 !important;
+  border: 1px solid #555555 !important;
+  border-radius: 0 !important;
+  opacity: 0.3 !important;
+}
+
+.react-resizable-handle::after {
+  border-color: #555555 !important;
+}
+
+/* Leaflet overrides for dark theme */
+.leaflet-container {
+  background: #000000;
+}
+
+.leaflet-control-zoom a {
+  background-color: #111111 !important;
+  color: #aaaaaa !important;
+  border-color: #333333 !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(0, 0, 0, 0.7) !important;
+  color: #555555 !important;
+  font-size: 9px !important;
+}
+
+.leaflet-control-attribution a {
+  color: #777777 !important;
 }
